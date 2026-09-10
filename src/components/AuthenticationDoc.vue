@@ -19,7 +19,7 @@
       <div class="glass-panel p-4 mb-5">
         <h3 class="h4 mb-3 text-dark"><i class="bi bi-globe text-primary me-2"></i>Base Service Endpoint</h3>
         <p class="text-secondary">All resource queries and transaction requests must be issued through HTTPS targeting the following base URL root path:</p>
-        <div class="bg-light rounded p-3 font-monospace border d-flex align-items-center">
+        <div class="bg-light rounded p-3 font-monospace border d-flex align-items-center flex-wrap" style="word-break: break-all;">
           <span class="text-primary fw-bold me-2">GET/POST</span> <span class="text-dark">https://api.pave360.com/api/external</span>
         </div>
       </div>

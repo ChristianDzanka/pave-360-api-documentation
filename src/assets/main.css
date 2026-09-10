@@ -292,18 +292,31 @@ pre code {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-  }
-  .mobile-logo-center {
-    position: static;
-    flex: 1;
-    justify-content: center;
-    margin: 0 8px;
-    min-width: 0;
+    flex-wrap: nowrap !important;
     overflow: hidden;
   }
+  .mobile-logo-center {
+    position: static !important;
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    margin: 0 8px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .mobile-logo-center img {
+    height: 24px !important;
+    flex-shrink: 0;
+  }
   .mobile-logo-center span {
-    font-size: 0.9rem !important;
-    white-space: nowrap;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .pave-main-nav {
+    height: 64px !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
   }
 }
 
