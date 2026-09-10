@@ -75,7 +75,7 @@ onUnmounted(() => {
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center fw-bold mx-md-0 mobile-logo-center" href="/">
           <img src="/assets/img/logo/logo-pave.png" alt="Pave360" height="32" class="me-2" style="object-fit: contain;">
-          <span class="text-white fs-5" style="letter-spacing: -0.5px;">API <span class="text-white-50 fw-normal">Documentation</span></span>
+          <span class="text-white fs-5" style="letter-spacing: -0.5px;">Developers</span>
         </a>
         
         <!-- Right side actions -->
