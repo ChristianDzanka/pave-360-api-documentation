@@ -288,10 +288,22 @@ pre code {
 }
 
 @media (max-width: 767.98px) {
+  .pave-main-nav .container-xxl {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
   .mobile-logo-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    flex: 1;
+    justify-content: center;
+    margin: 0 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .mobile-logo-center span {
+    font-size: 0.9rem !important;
+    white-space: nowrap;
   }
 }
 
