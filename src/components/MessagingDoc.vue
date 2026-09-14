@@ -16,6 +16,16 @@ const copyActiveTabCode = (wrapperId, key) => {
     }, 2000)
   })
 }
+
+const copyText = (text, key) => {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    copiedKey.value = key
+    setTimeout(() => {
+      if (copiedKey.value === key) copiedKey.value = null
+    }, 2000)
+  })
+}
 </script>
 
 <template>
@@ -75,8 +85,20 @@ const copyActiveTabCode = (wrapperId, key) => {
             <h3 class="h4 mb-0 text-dark fw-bold">/sms/send</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/sms/send</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/sms/send</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-sms-send' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/sms/send', 'url-sms-send')"
+              title="Copy endpoint URL"
+            >
+              <i :class="copiedKey === 'url-sms-send' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-sms-send'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Send Single Transactional SMS. Dispatches an immediate, priority SMS to a single recipient mobile number. Automatically creates an audit trail and logs delivery status in real-time.
@@ -381,8 +403,20 @@ response = requests.<span class="tok-fn">post</span>(url, json=payload, headers=
             <h3 class="h4 mb-0 text-dark fw-bold">/sms/campaign</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/sms/campaign</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/sms/campaign</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-sms-camp' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/sms/campaign', 'url-sms-camp')"
+              title="Copy endpoint URL"
+            >
+              <i :class="copiedKey === 'url-sms-camp' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-sms-camp'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Deploy Bulk SMS Campaign. Dispatches broadcast text campaigns to an array of recipients (comma-separated phone numbers) or targets an existing saved contact list.
@@ -687,8 +721,20 @@ response = requests.<span class="tok-fn">post</span>(url, json=payload, headers=
             <h3 class="h4 mb-0 text-dark fw-bold">/sms/status/:id</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/sms/status/:id</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/sms/status/:id</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-sms-stat' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/sms/status/:id', 'url-sms-stat')"
+              title="Copy endpoint URL"
+            >
+              <i :class="copiedKey === 'url-sms-stat' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-sms-stat'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Query SMS Campaign Status. Returns real-time database metrics showing processed logs, delivered handset acknowledgments (DLR), failed counts, pending transmissions, and the total targeted count.
@@ -992,8 +1038,20 @@ response = requests.<span class="tok-fn">get</span>(url, headers={<span class="t
             <h3 class="h4 mb-0 text-dark fw-bold">/voice/send</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/voice/send</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/voice/send</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-voice-send' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/voice/send', 'url-voice-send')"
+              title="Copy endpoint URL"
+            >
+              <i :class="copiedKey === 'url-voice-send' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-voice-send'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Create Voice Broadcast Campaign. Dispatches automated phone calls to designated mobile contacts, streaming your hosted audio file once the recipient answers the call.
@@ -1283,8 +1341,20 @@ response = requests.<span class="tok-fn">post</span>(url, json=payload, headers=
             <h3 class="h4 mb-0 text-dark fw-bold">/voice/status/:id</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/voice/status/:id</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/voice/status/:id</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-voice-stat' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/voice/status/:id', 'url-voice-stat')"
+              title="Copy endpoint URL"
+            >
+              <i :class="copiedKey === 'url-voice-stat' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-voice-stat'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Query Voice Campaign Status. Retrieves granular metrics including total dial attempts, answered calls, cumulative duration in seconds, and final queue completion status.

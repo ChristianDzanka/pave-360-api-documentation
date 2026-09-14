@@ -44,6 +44,18 @@ const runTestCall = () => {
     }
   }, 400)
 }
+
+const copiedOutput = ref(false)
+const copyResponse = () => {
+  if (!testOutput.value) return
+  const text = JSON.stringify(testOutput.value.response, null, 2)
+  navigator.clipboard.writeText(text).then(() => {
+    copiedOutput.value = true
+    setTimeout(() => {
+      copiedOutput.value = false
+    }, 2000)
+  })
+}
 </script>
 
 <template>
@@ -112,7 +124,21 @@ const runTestCall = () => {
               <h6 class="text-uppercase small fw-bold mb-0 text-muted">
                 <i class="bi bi-display me-1 text-primary"></i> Live Output Response
               </h6>
-              <span v-if="testOutput" class="status-pill status-200">200 OK</span>
+              <div class="d-flex align-items-center gap-2">
+                <span v-if="testOutput" class="status-pill status-200">200 OK</span>
+                <button
+                  v-if="testOutput"
+                  type="button"
+                  class="copy-url-btn py-0 px-2"
+                  :class="{ copied: copiedOutput }"
+                  @click="copyResponse"
+                  title="Copy response JSON"
+                  style="font-size: 0.75rem;"
+                >
+                  <i :class="copiedOutput ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                  <span v-if="copiedOutput" class="ms-1 text-success fw-semibold">Copied!</span>
+                </button>
+              </div>
             </div>
             <div v-if="!testOutput" class="flex-grow-1 d-flex flex-column align-items-center justify-content-center border rounded-3 border-light bg-white text-center p-4">
               <i class="bi bi-terminal fs-1 text-muted opacity-50 mb-2"></i>

@@ -1,3 +1,19 @@
+<script setup>
+import { ref } from 'vue'
+
+const copiedKey = ref(null)
+
+const copyText = (text, key) => {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    copiedKey.value = key
+    setTimeout(() => {
+      if (copiedKey.value === key) copiedKey.value = null
+    }, 2000)
+  })
+}
+</script>
+
 <template>
   <div class="overview-doc">
     <!-- API Overview -->
@@ -79,8 +95,21 @@
               <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Production Environment</span>
               <small class="text-muted font-monospace">Live Traffic</small>
             </div>
-            <div class="bg-light rounded p-2 font-monospace border small mb-2 text-dark font-monospace text-break">
-              https://api.pave360.com/api/external
+            <div class="endpoint-url-chip mb-2">
+              <div class="d-flex align-items-center me-2 text-truncate">
+                <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+                <span class="text-truncate">https://api.pave360.com/api/external</span>
+              </div>
+              <button 
+                type="button" 
+                class="copy-url-btn" 
+                :class="{ copied: copiedKey === 'url-base-prod' }"
+                @click.stop="copyText('https://api.pave360.com/api/external', 'url-base-prod')"
+                title="Copy URL"
+              >
+                <i :class="copiedKey === 'url-base-prod' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                <span v-if="copiedKey === 'url-base-prod'" class="ms-1 small text-success fw-semibold">Copied!</span>
+              </button>
             </div>
             <p class="text-secondary small mb-0">Use with your production API key (<code>pk_live_...</code>). Debits active messaging unit balances and routes directly to live mobile networks.</p>
           </div>
@@ -91,8 +120,21 @@
               <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">Sandbox Environment</span>
               <small class="text-muted font-monospace">Testing & Staging</small>
             </div>
-            <div class="bg-light rounded p-2 font-monospace border small mb-2 text-dark font-monospace text-break">
-              https://sandbox.pave360.com/api/external
+            <div class="endpoint-url-chip mb-2">
+              <div class="d-flex align-items-center me-2 text-truncate">
+                <i class="bi bi-link-45deg text-info me-1 flex-shrink-0"></i>
+                <span class="text-truncate">https://sandbox.pave360.com/api/external</span>
+              </div>
+              <button 
+                type="button" 
+                class="copy-url-btn" 
+                :class="{ copied: copiedKey === 'url-base-sandbox' }"
+                @click.stop="copyText('https://sandbox.pave360.com/api/external', 'url-base-sandbox')"
+                title="Copy URL"
+              >
+                <i :class="copiedKey === 'url-base-sandbox' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                <span v-if="copiedKey === 'url-base-sandbox'" class="ms-1 small text-success fw-semibold">Copied!</span>
+              </button>
             </div>
             <p class="text-secondary small mb-0">Use with test credentials or within the interactive Playground. Simulates successful dispatches and error responses with zero billing cost.</p>
           </div>
@@ -116,21 +158,57 @@
           <div class="moolre-param-row">
             <div class="moolre-param-header">
               <span class="moolre-param-name">Production Host</span>
-              <span class="moolre-param-type">api.pave360.com</span>
+              <span class="moolre-param-type d-inline-flex align-items-center gap-1">
+                <span>api.pave360.com</span>
+                <button 
+                  type="button" 
+                  class="copy-url-btn p-0 px-1 border-0" 
+                  :class="{ copied: copiedKey === 'host-prod' }"
+                  @click.stop="copyText('api.pave360.com', 'host-prod')"
+                  title="Copy host"
+                  style="min-height: auto; height: 20px; font-size: 0.7rem;"
+                >
+                  <i :class="copiedKey === 'host-prod' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                </button>
+              </span>
             </div>
             <p class="moolre-param-desc">Fully-qualified live production API gateway cluster with multi-telco routing interconnects.</p>
           </div>
           <div class="moolre-param-row">
             <div class="moolre-param-header">
               <span class="moolre-param-name">Sandbox Host</span>
-              <span class="moolre-param-type">sandbox.pave360.com</span>
+              <span class="moolre-param-type d-inline-flex align-items-center gap-1">
+                <span>sandbox.pave360.com</span>
+                <button 
+                  type="button" 
+                  class="copy-url-btn p-0 px-1 border-0" 
+                  :class="{ copied: copiedKey === 'host-sandbox' }"
+                  @click.stop="copyText('sandbox.pave360.com', 'host-sandbox')"
+                  title="Copy host"
+                  style="min-height: auto; height: 20px; font-size: 0.7rem;"
+                >
+                  <i :class="copiedKey === 'host-sandbox' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                </button>
+              </span>
             </div>
             <p class="moolre-param-desc">Sandbox mock server for pre-production integration testing, staging environments, and CI/CD pipelines.</p>
           </div>
           <div class="moolre-param-row">
             <div class="moolre-param-header">
               <span class="moolre-param-name">Base Path</span>
-              <span class="moolre-param-type">/api/external</span>
+              <span class="moolre-param-type d-inline-flex align-items-center gap-1">
+                <span>/api/external</span>
+                <button 
+                  type="button" 
+                  class="copy-url-btn p-0 px-1 border-0" 
+                  :class="{ copied: copiedKey === 'base-path' }"
+                  @click.stop="copyText('/api/external', 'base-path')"
+                  title="Copy base path"
+                  style="min-height: auto; height: 20px; font-size: 0.7rem;"
+                >
+                  <i :class="copiedKey === 'base-path' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                </button>
+              </span>
             </div>
             <p class="moolre-param-desc">Mandatory path prefix prepended to all resource endpoints across SMS, Voice, USSD, and OTP APIs.</p>
           </div>
@@ -188,8 +266,18 @@
           </div>
         </div>
 
-        <div class="code-box-wrapper p-3 mb-4 shadow-sm">
-          <div class="font-monospace small text-white-50">
+        <div class="code-box-wrapper p-3 mb-4 shadow-sm position-relative">
+          <button 
+            type="button" 
+            class="copy-url-btn position-absolute top-0 end-0 m-2" 
+            :class="{ copied: copiedKey === 'curl-auth-example' }"
+            @click.stop="copyText('curl -H &quot;x-api-key: pk_live_3892a0f82c4...&quot; -H &quot;Content-Type: application/json&quot; https://api.pave360.com/api/external/sms/send', 'curl-auth-example')"
+            title="Copy snippet"
+          >
+            <i :class="copiedKey === 'curl-auth-example' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+            <span v-if="copiedKey === 'curl-auth-example'" class="ms-1 small text-success fw-semibold">Copied!</span>
+          </button>
+          <div class="font-monospace small text-white-50 pe-5">
             <span class="tok-cmt"># Example cURL authorization header</span><br />
             <span class="tok-fn">curl</span> <span class="tok-flag">-H</span> <span class="tok-str">"x-api-key: pk_live_3892a0f82c4..."</span> <span class="tok-flag">-H</span> <span class="tok-str">"Content-Type: application/json"</span> https://api.pave360.com/api/external/sms/send
           </div>

@@ -3,6 +3,16 @@ import { ref } from 'vue'
 
 const copiedKey = ref(null)
 
+const copyText = (text, key) => {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    copiedKey.value = key
+    setTimeout(() => {
+      if (copiedKey.value === key) copiedKey.value = null
+    }, 2000)
+  })
+}
+
 const copyActiveTabCode = (wrapperId, key) => {
   const wrapper = document.getElementById(wrapperId)
   if (!wrapper) return
@@ -81,8 +91,20 @@ const copyActiveTabCode = (wrapperId, key) => {
             <h3 class="h4 mb-0 text-dark fw-bold">/otp/send</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/otp/send</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/otp/send</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-otp-send' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/otp/send', 'url-otp-send')"
+              title="Copy URL"
+            >
+              <i :class="copiedKey === 'url-otp-send' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-otp-send'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Send Configurable One-Time Password. Dispatches a high-priority cryptographic verification token to a mobile phone number. Character length, token charset, expiration duration, custom SMS copy, and Sender ID can be tailored to your brand.
@@ -395,8 +417,20 @@ response = requests.<span class="tok-fn">post</span>(url, json=payload, headers=
             <h3 class="h4 mb-0 text-dark fw-bold">/otp/verify</h3>
           </div>
           <div class="endpoint-url-chip mb-3">
-            <i class="bi bi-link-45deg text-success me-1"></i>
-            <span>https://api.pave360.com/api/external/otp/verify</span>
+            <div class="d-flex align-items-center me-2 text-truncate">
+              <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+              <span class="text-truncate">https://api.pave360.com/api/external/otp/verify</span>
+            </div>
+            <button 
+              type="button" 
+              class="copy-url-btn" 
+              :class="{ copied: copiedKey === 'url-otp-verify' }"
+              @click.stop="copyText('https://api.pave360.com/api/external/otp/verify', 'url-otp-verify')"
+              title="Copy URL"
+            >
+              <i :class="copiedKey === 'url-otp-verify' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+              <span v-if="copiedKey === 'url-otp-verify'" class="ms-1 small text-success fw-semibold">Copied!</span>
+            </button>
           </div>
           <p class="text-secondary lead fs-6">
             Verify One-Time Password. Validates the code submitted by the user against the active OTP database session. Upon successful verification, the token is permanently consumed and marked verified.

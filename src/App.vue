@@ -337,8 +337,8 @@ onUnmounted(() => {
     <!-- Three-Column Core Layout -->
     <div class="three-column-layout flex-grow-1">
       
-      <!-- FIXED MAIN LEFT SIDEBAR (Primary Navigation - Simple & Professional like Moolre) -->
-      <aside class="fixed-left-sidebar" aria-label="Primary Navigation">
+      <!-- FIXED MAIN LEFT SIDEBAR (Primary Navigation - Desktop Only) -->
+      <aside class="fixed-left-sidebar d-none d-lg-block" aria-label="Primary Navigation">
         <div class="sidebar-wrapper">
           
           <!-- Parent Category 1: Getting Started -->
@@ -428,27 +428,13 @@ onUnmounted(() => {
       <!-- CENTER DYNAMIC CONTENT CONTAINER (Directly in Center) -->
       <main class="center-content-container">
         <div class="center-content-inner">
-          <!-- Mobile Subnav Horizontal Pills (Visible on screens < 992px) -->
-          <div class="d-lg-none mobile-subnav-bar">
-            <button
-              v-for="item in currentSubmenus"
-              :key="item.id"
-              class="mobile-subnav-pill"
-              :class="{ active: activeSubId === item.id }"
-              @click="scrollToSubMenu(item.id)"
-            >
-              <i :class="['bi', item.icon, 'me-1 small']"></i>
-              {{ item.title }}
-            </button>
-          </div>
-
           <!-- Dynamic Vue Component rendering the active left navigation item -->
           <component :is="currentSection.component" />
         </div>
       </main>
 
-      <!-- FIXED SECONDARY RIGHT SIDEBAR (Sub-Menu Navigation - Simple & Professional) -->
-      <aside class="fixed-right-sidebar" aria-label="Sub-Menu Navigation">
+      <!-- FIXED SECONDARY RIGHT SIDEBAR (Sub-Menu Navigation - Desktop Only) -->
+      <aside class="fixed-right-sidebar d-none d-lg-block" aria-label="Sub-Menu Navigation">
         <div class="sidebar-wrapper">
           <h6 class="text-uppercase text-muted fw-bold mb-3 small mt-1" style="letter-spacing: 0.5px;">
             <i class="bi bi-list-nested me-2"></i> On this page

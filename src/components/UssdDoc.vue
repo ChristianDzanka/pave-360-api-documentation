@@ -16,6 +16,16 @@ const copyActiveTabCode = (wrapperId, key) => {
     }, 2000)
   })
 }
+
+const copyText = (text, key) => {
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => {
+    copiedKey.value = key
+    setTimeout(() => {
+      if (copiedKey.value === key) copiedKey.value = null
+    }, 2000)
+  })
+}
 </script>
 
 <template>
@@ -86,8 +96,20 @@ const copyActiveTabCode = (wrapperId, key) => {
               <h3 class="h4 mb-0 text-dark fw-bold">/ussd/callback</h3>
             </div>
             <div class="endpoint-url-chip mb-3">
-              <i class="bi bi-link-45deg text-success me-1"></i>
-              <span>Your Configured Webhook URL</span>
+              <div class="d-flex align-items-center me-2 text-truncate">
+                <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+                <span class="text-truncate">https://api.pave360.com/api/external/ussd/callback</span>
+              </div>
+              <button 
+                type="button" 
+                class="copy-url-btn" 
+                :class="{ copied: copiedKey === 'url-ussd-cb' }"
+                @click.stop="copyText('https://api.pave360.com/api/external/ussd/callback', 'url-ussd-cb')"
+                title="Copy webhook endpoint URL"
+              >
+                <i :class="copiedKey === 'url-ussd-cb' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                <span v-if="copiedKey === 'url-ussd-cb'" class="ms-1 small text-success fw-semibold">Copied!</span>
+              </button>
             </div>
             <p class="text-secondary lead fs-6">
               Inbound Session Webhook. When a subscriber dials your shortcode (e.g. <code>*920*360#</code>) or enters menu responses, Pave360 relays an HTTP POST request to your webhook URL and awaits your menu instructions.
@@ -339,8 +361,20 @@ app = Flask(__name__)
               <h3 class="h4 mb-0 text-dark fw-bold">/ussd/send</h3>
             </div>
             <div class="endpoint-url-chip mb-3">
-              <i class="bi bi-link-45deg text-success me-1"></i>
-              <span>https://api.pave360.com/api/external/ussd/send</span>
+              <div class="d-flex align-items-center me-2 text-truncate">
+                <i class="bi bi-link-45deg text-success me-1 flex-shrink-0"></i>
+                <span class="text-truncate">https://api.pave360.com/api/external/ussd/send</span>
+              </div>
+              <button 
+                type="button" 
+                class="copy-url-btn" 
+                :class="{ copied: copiedKey === 'url-ussd-send' }"
+                @click.stop="copyText('https://api.pave360.com/api/external/ussd/send', 'url-ussd-send')"
+                title="Copy endpoint URL"
+              >
+                <i :class="copiedKey === 'url-ussd-send' ? 'bi bi-check2 text-success' : 'bi bi-clipboard'"></i>
+                <span v-if="copiedKey === 'url-ussd-send'" class="ms-1 small text-success fw-semibold">Copied!</span>
+              </button>
             </div>
             <p class="text-secondary lead fs-6">
               Outbound USSD Push (Network Initiated). Dispatches an interactive prompt dialog directly onto a customer's handset screen, demanding instant authorization (e.g. mobile money approvals, login verifications).

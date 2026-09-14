@@ -467,6 +467,28 @@ pre code {
   z-index: 10;
 }
 
+/* Mobile & Tablet Responsiveness: Disable 3-column session and hide sidebars */
+@media (max-width: 991.98px) {
+  .three-column-layout {
+    display: block !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 1rem !important;
+    min-height: auto !important;
+  }
+
+  .fixed-left-sidebar,
+  .fixed-right-sidebar {
+    display: none !important;
+  }
+
+  .center-content-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 1.25rem 0.25rem 4rem 0.25rem !important;
+  }
+}
+
 /* Seamless Sidebar Navigation (Clean, Minimal like docs.moolre.com) */
 .sidebar-wrapper {
   background: transparent !important;
@@ -938,20 +960,59 @@ pre code {
   border: 1px solid rgba(2, 132, 199, 0.2);
 }
 
-/* Endpoint URL Chip */
+/* Endpoint URL Chip & Copy Actions */
 .endpoint-url-chip {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 0.35rem 0.75rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.82rem;
   color: #334155;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  justify-content: space-between;
+  gap: 0.5rem;
   word-break: break-all;
   max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+.endpoint-url-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.copy-url-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 3px 6px;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-url-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.copy-url-btn.copied {
+  color: #059669 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.copy-url-btn i {
+  font-size: 0.85rem;
 }
 
 /* Response Code Status Badge in Tab */
