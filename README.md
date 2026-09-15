@@ -256,20 +256,26 @@ The project includes an automated deployment pipeline configured via **GitHub Ac
 1. **Trigger**: Pushes to `main` or `dev` branches.
 2. **Build**: Checks out code on `ubuntu-latest`, provisions Node.js 22, installs dependencies via `npm ci`, and executes `npm run build`.
 3. **Environment Selection**:
-   - `main` branch: Targets the production AWS S3 bucket (`AWS_APP_PAVE360_BUCKET`).
-   - `dev` branch: Targets the development AWS S3 bucket (`AWS_APP_PAVE360_BUCKET_DEV`).
-4. **Sync**: Synchronizes the `dist/` build directory to the target S3 bucket using `jakejarvis/s3-sync-action` with `--delete` flag to remove stale assets.
+   - `main` branch: Targets the production AWS S3 bucket (`AWS_APP_PAVE360_BUCKET`) and CloudFront distribution (`AWS_CLOUDFRONT_DISTRIBUTION_ID`).
+   - `dev` branch: Targets the development AWS S3 bucket (`AWS_APP_PAVE360_BUCKET_DEV`) and CloudFront distribution (`AWS_CLOUDFRONT_DISTRIBUTION_ID_DEV`).
+4. **Multi-Layer Cache Invalidation on Deploy**:
+   - **Immutable Asset Sync**: All hashed JS, CSS, images, and fonts are synced with `Cache-Control: public, max-age=31536000, immutable`.
+   - **No-Cache HTML & Version Manifest**: `index.html` and `version.json` are uploaded with `Cache-Control: no-cache, no-store, must-revalidate, max-age=0`.
+   - **CloudFront CDN Cache Purge**: If distribution ID is provided, automatically executes `aws cloudfront create-invalidation --paths "/*"`.
+   - **Client Auto-Refresh**: The frontend client listens for new deployment timestamps on tab focus and refreshes stale tabs automatically.
 
 ### Required GitHub Secrets
 
-| Secret Name | Description |
-| :--- | :--- |
-| `AWS_APP_PAVE360_BUCKET` | Production AWS S3 bucket name |
-| `AWS_APP_PAVE360_BUCKET_DEV` | Development AWS S3 bucket name |
-| `AWS_APP_PAVE360_ACCESS_KEY` | AWS IAM Access Key ID |
-| `AWS_APP_PAVE360_SECRET` | AWS IAM Secret Access Key |
-| `AWS_APP_PAVE360_REGION` | AWS Region (e.g. `eu-west-1`, `us-east-1`) |
-| `VITE_BASE_URL` | Base API endpoint for the deployment |
+| Secret Name | Description | Required? |
+| :--- | :--- | :--- |
+| `AWS_APP_PAVE360_BUCKET` | Production AWS S3 bucket name | Yes |
+| `AWS_APP_PAVE360_BUCKET_DEV` | Development AWS S3 bucket name | Yes |
+| `AWS_APP_PAVE360_ACCESS_KEY` | AWS IAM Access Key ID | Yes |
+| `AWS_APP_PAVE360_SECRET` | AWS IAM Secret Access Key | Yes |
+| `AWS_APP_PAVE360_REGION` | AWS Region (e.g. `eu-west-1`, `us-east-1`) | Yes |
+| `AWS_CLOUDFRONT_DISTRIBUTION_ID` | Production CloudFront Distribution ID for edge cache invalidation | Optional |
+| `AWS_CLOUDFRONT_DISTRIBUTION_ID_DEV` | Development CloudFront Distribution ID for edge cache invalidation | Optional |
+| `VITE_BASE_URL` | Base API endpoint for the deployment | Optional |
 
 ---
 

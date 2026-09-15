@@ -41,29 +41,62 @@ jobs:
             echo "access_key=${{ secrets.AWS_APP_PAVE360_ACCESS_KEY }}" >> $GITHUB_OUTPUT
             echo "secret_key=${{ secrets.AWS_APP_PAVE360_SECRET }}" >> $GITHUB_OUTPUT
             echo "region=${{ secrets.AWS_APP_PAVE360_REGION }}" >> $GITHUB_OUTPUT
+            echo "cf_dist=${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" >> $GITHUB_OUTPUT
           else
             echo "env=development" >> $GITHUB_OUTPUT
             echo "bucket=${{ secrets.AWS_APP_PAVE360_BUCKET_DEV }}" >> $GITHUB_OUTPUT
             echo "access_key=${{ secrets.AWS_APP_PAVE360_ACCESS_KEY }}" >> $GITHUB_OUTPUT
             echo "secret_key=${{ secrets.AWS_APP_PAVE360_SECRET }}" >> $GITHUB_OUTPUT
             echo "region=${{ secrets.AWS_APP_PAVE360_REGION }}" >> $GITHUB_OUTPUT
+            echo "cf_dist=${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID_DEV }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Deploy to AWS S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --delete
+      # 1. Sync immutable hashed assets (JS, CSS, images, fonts)
+      - name: Deploy Assets to S3 (Immutable Cache)
+        run: |
+          aws s3 sync dist/ s3://${{ steps.envselect.outputs.bucket }} \
+            --delete \
+            --exclude "index.html" \
+            --exclude "version.json" \
+            --cache-control "public, max-age=31536000, immutable"
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_APP_PAVE360_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_APP_PAVE360_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_APP_PAVE360_SECRET }}
-          AWS_REGION: ${{ secrets.AWS_APP_PAVE360_REGION }}
-          SOURCE_DIR: dist
+          AWS_ACCESS_KEY_ID: ${{ steps.envselect.outputs.access_key }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.envselect.outputs.secret_key }}
+          AWS_DEFAULT_REGION: ${{ steps.envselect.outputs.region }}
+
+      # 2. Upload entry HTML & version manifest with NO-CACHE headers
+      - name: Deploy HTML & Version Manifest (No Cache)
+        run: |
+          aws s3 cp dist/index.html s3://${{ steps.envselect.outputs.bucket }}/index.html \
+            --cache-control "no-cache, no-store, must-revalidate, max-age=0" \
+            --content-type "text/html"
+          if [ -f dist/version.json ]; then
+            aws s3 cp dist/version.json s3://${{ steps.envselect.outputs.bucket }}/version.json \
+              --cache-control "no-cache, no-store, must-revalidate, max-age=0" \
+              --content-type "application/json"
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.envselect.outputs.access_key }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.envselect.outputs.secret_key }}
+          AWS_DEFAULT_REGION: ${{ steps.envselect.outputs.region }}
+
+      # 3. CloudFront Edge Cache Invalidation (if CloudFront distribution is configured)
+      - name: Invalidate CloudFront CDN Cache
+        if: steps.envselect.outputs.cf_dist != ''
+        run: |
+          echo "Triggering CloudFront cache invalidation for distribution: ${{ steps.envselect.outputs.cf_dist }}"
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.envselect.outputs.cf_dist }} \
+            --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.envselect.outputs.access_key }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.envselect.outputs.secret_key }}
+          AWS_DEFAULT_REGION: ${{ steps.envselect.outputs.region }}
 
       - name: Post-deploy note
         if: success()
         run: |
-          echo "✅ Deployed to ${{ github.ref_name }} (Bucket: ${{ secrets.AWS_APP_PAVE360_BUCKET }})"
+          echo "✅ Deployed to ${{ github.ref_name }} (Bucket: ${{ steps.envselect.outputs.bucket }})"
 
       - name: Deployment summary
         run: |

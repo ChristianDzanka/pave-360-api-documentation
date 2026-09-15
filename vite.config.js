@@ -1,7 +1,30 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 
+function versionPlugin() {
+  return {
+    name: 'version-generator',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify(
+          {
+            version: Date.now().toString(),
+            builtAt: new Date().toISOString()
+          },
+          null,
+          2
+        )
+      })
+    }
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), versionPlugin()],
+  define: {
+    __APP_BUILD_TIME__: JSON.stringify(Date.now().toString())
+  }
 })
