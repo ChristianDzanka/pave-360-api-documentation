@@ -367,6 +367,101 @@ pre code {
   color: #adff1c !important;
 }
 
+/* Offcanvas Nested Accordion & Submenus (Suggestion 3 Integration) */
+.offcanvas-section-row {
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.offcanvas-toggle-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45) !important;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.offcanvas-toggle-btn i {
+  color: inherit !important;
+}
+
+.offcanvas-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.offcanvas-sub-list {
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+.offcanvas-sub-link {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  border-radius: 6px;
+  margin-bottom: 2px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.offcanvas-sub-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.offcanvas-sub-link.active {
+  color: #ffffff !important;
+  background-color: rgba(173, 255, 28, 0.12) !important;
+  font-weight: 600;
+}
+
+.offcanvas-sub-link .sub-bullet {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.offcanvas-sub-link.active .sub-bullet {
+  color: var(--pave-accent) !important;
+}
+
+.offcanvas-sub-link .method-badge.small-badge {
+  font-size: 0.62rem;
+  padding: 0.1rem 0.4rem;
+}
+
+.offcanvas-sub-link .method-badge.post {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.offcanvas-sub-link .method-badge.get {
+  background: rgba(14, 165, 233, 0.16);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+/* Drawer Sub-accordion transition */
+.drawer-sub-slide-enter-active,
+.drawer-sub-slide-leave-active {
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.drawer-sub-slide-enter-from,
+.drawer-sub-slide-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
 @media (max-width: 767.98px) {
   .pave-main-nav .container-xxl,
   .pave-main-nav .pave-nav-container {
@@ -557,6 +652,168 @@ pre code {
   color: #059669 !important;
   border-left: 2px solid #10b981;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   Mobile Sticky "On this page" Bar (< 992px) - Glassmorphic Compact Style
+   ========================================================================== */
+.mobile-toc-wrapper {
+  position: sticky;
+  top: 64px;
+  z-index: 1024;
+  width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .mobile-toc-wrapper {
+    top: 80px;
+  }
+}
+
+.mobile-toc-bar {
+  height: 38px;
+  padding: 0 1rem;
+  background-color: rgba(10, 40, 40, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1026;
+}
+
+.mobile-toc-bar:hover,
+.mobile-toc-bar.is-open {
+  background-color: rgba(12, 46, 46, 0.85);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.mobile-toc-bar-content {
+  width: 100%;
+}
+
+.mobile-toc-icon {
+  font-size: 0.85rem;
+  color: var(--pave-accent) !important;
+}
+
+.mobile-toc-prefix {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.mobile-toc-title {
+  font-size: 0.78rem;
+  letter-spacing: -0.15px;
+}
+
+.mobile-toc-chevron {
+  font-size: 0.72rem;
+  transition: transform 0.2s ease;
+}
+
+.mobile-toc-bar.is-open .mobile-toc-chevron {
+  color: var(--pave-accent) !important;
+}
+
+.mobile-toc-bar .method-badge.small-badge {
+  font-size: 0.6rem;
+  padding: 0.08rem 0.38rem;
+  border-radius: 3px;
+}
+
+.mobile-toc-bar .method-badge.post,
+.mobile-toc-dropdown .method-badge.post {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.mobile-toc-bar .method-badge.get,
+.mobile-toc-dropdown .method-badge.get {
+  background: rgba(14, 165, 233, 0.18);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+/* Floating Glassmorphic Dropdown Card */
+.mobile-toc-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 10px;
+  right: 10px;
+  background-color: rgba(8, 30, 30, 0.78);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  max-height: 45vh;
+  overflow-y: auto;
+  z-index: 1026;
+  padding: 0.35rem 0.35rem 0.5rem 0.35rem;
+}
+
+.mobile-toc-link {
+  color: rgba(255, 255, 255, 0.72);
+  padding: 0.35rem 0.65rem;
+  border-radius: 7px;
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.mobile-toc-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.mobile-toc-link.active {
+  background-color: rgba(173, 255, 28, 0.14) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-left: 2px solid var(--pave-accent);
+}
+
+.mobile-toc-link .mobile-item-icon {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 0.8rem;
+}
+
+.mobile-toc-link.active .mobile-item-icon {
+  color: var(--pave-accent) !important;
+}
+
+/* Subtle, transparent Backdrop - does NOT black out the page */
+.mobile-toc-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.15);
+  z-index: 1022;
+}
+
+/* Slide Transition with subtle scale */
+.mobile-toc-slide-enter-active,
+.mobile-toc-slide-leave-active {
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
+}
+
+.mobile-toc-slide-enter-from,
+.mobile-toc-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
 }
 
 /* Endpoint Section (Minimal, Flowing, No Heavy Cards) */

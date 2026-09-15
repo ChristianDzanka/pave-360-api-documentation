@@ -5,7 +5,7 @@ import UssdDoc from './components/UssdDoc.vue'
 import AuthEndpointsDoc from './components/AuthEndpointsDoc.vue'
 import PlaygroundDoc from './components/PlaygroundDoc.vue'
 import DiagnosticsDoc from './components/DiagnosticsDoc.vue'
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 
 const sections = [
   {
@@ -98,6 +98,7 @@ const activeSectionId = ref('overview')
 const activeSubId = ref('overview')
 const isManualScrolling = ref(false)
 const showScrollTop = ref(false)
+const isMobileTocOpen = ref(false)
 
 const currentSection = computed(() => {
   return sections.find(s => s.id === activeSectionId.value) || sections[0]
@@ -107,8 +108,47 @@ const currentSubmenus = computed(() => {
   return currentSection.value.submenus || []
 })
 
+const activeSubmenuItem = computed(() => {
+  return currentSubmenus.value.find(item => item.id === activeSubId.value) || currentSubmenus.value[0] || null
+})
+
+const categories = ['Getting Started', 'Endpoints', 'Developer Tools']
+
+const getSectionsByCategory = (category) => {
+  return sections.filter(s => s.category === category)
+}
+
+// Accordion state: only one section's submenu is expanded at a time in the mobile drawer
+const expandedSectionId = ref(activeSectionId.value)
+
+watch(activeSectionId, (newId) => {
+  expandedSectionId.value = newId
+})
+
+const isSectionExpanded = (sectionId) => {
+  return expandedSectionId.value === sectionId
+}
+
+const toggleSection = (sectionId) => {
+  if (expandedSectionId.value === sectionId) {
+    expandedSectionId.value = null
+  } else {
+    expandedSectionId.value = sectionId
+  }
+}
+
+const handleSectionClick = (sectionId) => {
+  if (activeSectionId.value === sectionId) {
+    toggleSection(sectionId)
+  } else {
+    switchSection(sectionId)
+  }
+}
+
 const switchSection = (sectionId) => {
   activeSectionId.value = sectionId
+  isMobileTocOpen.value = false
+  expandedSectionId.value = sectionId
   const section = sections.find(s => s.id === sectionId)
   if (section && section.submenus && section.submenus.length > 0) {
     activeSubId.value = section.submenus[0].id
@@ -118,10 +158,16 @@ const switchSection = (sectionId) => {
 
 const scrollToSubMenu = (subId) => {
   activeSubId.value = subId
+  isMobileTocOpen.value = false
   isManualScrolling.value = true
   const element = document.getElementById(subId)
   if (element) {
-    const navOffset = 95
+    let navOffset = 95
+    if (window.innerWidth < 768) {
+      navOffset = 112
+    } else if (window.innerWidth < 992) {
+      navOffset = 128
+    }
     const y = element.getBoundingClientRect().top + window.scrollY - navOffset
     window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
     setTimeout(() => {
@@ -131,6 +177,8 @@ const scrollToSubMenu = (subId) => {
 }
 
 const navigateTo = (sectionId, subId) => {
+  isMobileTocOpen.value = false
+  expandedSectionId.value = sectionId
   if (activeSectionId.value !== sectionId) {
     activeSectionId.value = sectionId
     nextTick(() => {
@@ -153,7 +201,8 @@ const handleScroll = () => {
   const submenus = currentSubmenus.value
   if (!submenus || submenus.length === 0) return
 
-  const scrollPosition = window.scrollY + 130
+  const scrollOffset = window.innerWidth < 768 ? 120 : (window.innerWidth < 992 ? 136 : 130)
+  const scrollPosition = window.scrollY + scrollOffset
   let current = submenus[0].id
 
   for (const item of submenus) {
@@ -177,13 +226,21 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && isMobileTocOpen.value) {
+    isMobileTocOpen.value = false
+  }
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('keydown', handleKeydown)
   handleScroll()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
@@ -236,6 +293,73 @@ onUnmounted(() => {
       </div>
     </nav>
 
+    <!-- Mobile Sticky 'On this page' Sub-bar (Mobile & Tablet: < 992px) -->
+    <div v-if="currentSubmenus.length > 0" class="mobile-toc-wrapper d-lg-none">
+      <div 
+        class="mobile-toc-bar" 
+        :class="{ 'is-open': isMobileTocOpen }"
+        role="button"
+        tabindex="0"
+        aria-label="On this page navigation"
+        :aria-expanded="isMobileTocOpen"
+        @click="isMobileTocOpen = !isMobileTocOpen"
+        @keydown.enter="isMobileTocOpen = !isMobileTocOpen"
+        @keydown.space.prevent="isMobileTocOpen = !isMobileTocOpen"
+      >
+        <div class="mobile-toc-bar-content d-flex justify-content-between align-items-center w-100">
+          <div class="d-flex align-items-center gap-2 overflow-hidden me-2">
+            <i class="bi bi-list-nested mobile-toc-icon"></i>
+            <span class="mobile-toc-prefix text-white-50">On this page:</span>
+            <span class="mobile-toc-title text-white fw-semibold text-truncate">
+              {{ activeSubmenuItem?.title || 'Sections' }}
+            </span>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span v-if="activeSubmenuItem?.method" class="method-badge small-badge" :class="activeSubmenuItem.method.toLowerCase()">
+              {{ activeSubmenuItem.method }}
+            </span>
+            <i class="bi mobile-toc-chevron" :class="isMobileTocOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Dropdown -->
+      <transition name="mobile-toc-slide">
+        <div v-if="isMobileTocOpen" class="mobile-toc-dropdown custom-scrollbar" role="region" aria-label="Sections list">
+          <div class="mobile-toc-dropdown-header px-2 pt-2 pb-1 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+            <span class="text-uppercase fw-bold text-white-50" style="font-size: 0.64rem; letter-spacing: 0.08em;">
+              {{ currentSection.title }} &mdash; Sections
+            </span>
+          </div>
+          <ul class="nav flex-column mb-0 py-1 px-1">
+            <li v-for="item in currentSubmenus" :key="item.id" class="nav-item">
+              <a 
+                class="mobile-toc-link d-flex align-items-center justify-content-between" 
+                :class="{'active': activeSubId === item.id}" 
+                href="#" 
+                @click.prevent="scrollToSubMenu(item.id)"
+              >
+                <span class="d-flex align-items-center text-truncate me-2">
+                  <i :class="['bi', item.icon, 'me-2 mobile-item-icon']"></i>
+                  <span class="text-truncate">{{ item.title }}</span>
+                </span>
+                <span v-if="item.method" class="method-badge small-badge" :class="item.method.toLowerCase()">
+                  {{ item.method }}
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </transition>
+
+      <!-- Backdrop Overlay when expanded -->
+      <div 
+        v-if="isMobileTocOpen" 
+        class="mobile-toc-backdrop" 
+        @click="isMobileTocOpen = false"
+      ></div>
+    </div>
+
     <!-- Credentials Modal -->
     <div class="modal fade" id="credentialsModal" tabindex="-1" aria-labelledby="credentialsModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -280,50 +404,59 @@ onUnmounted(() => {
       </div>
 
       <div class="offcanvas-body p-4 custom-scrollbar">
-        <!-- Getting Started -->
-        <h6 class="text-uppercase text-white-50 fw-bold mb-2 small" style="letter-spacing: 0.5px;">Getting Started</h6>
-        <ul class="nav flex-column mb-3 ps-2">
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'overview'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('overview')">
-              <i class="bi bi-book me-2"></i> Overview
-            </a>
-          </li>
-        </ul>
+        <div v-for="cat in categories" :key="cat" class="mb-4">
+          <h6 class="text-uppercase text-white-50 fw-bold mb-2 small" style="letter-spacing: 0.5px;">
+            {{ cat }}
+          </h6>
+          <ul class="nav flex-column ps-1">
+            <li v-for="sec in getSectionsByCategory(cat)" :key="sec.id" class="nav-item mb-1">
+              <div class="d-flex align-items-center justify-content-between offcanvas-section-row" :class="{'active-row': activeSectionId === sec.id}">
+                <a 
+                  class="nav-link offcanvas-link d-flex align-items-center flex-grow-1 py-2 text-truncate" 
+                  :class="{'active text-white': activeSectionId === sec.id}" 
+                  href="#" 
+                  @click.prevent="handleSectionClick(sec.id)"
+                >
+                  <i :class="['bi', sec.icon, 'me-2']"></i>
+                  <span class="text-truncate">{{ sec.title }}</span>
+                </a>
+                <button 
+                  v-if="sec.submenus && sec.submenus.length > 0"
+                  type="button"
+                  class="btn btn-sm p-1 me-1 offcanvas-toggle-btn shadow-none"
+                  :aria-label="'Toggle ' + sec.title + ' submenus'"
+                  @click.stop="toggleSection(sec.id)"
+                >
+                  <i class="bi" :class="isSectionExpanded(sec.id) ? 'bi-chevron-up' : 'bi-chevron-down'" style="font-size: 0.75rem;"></i>
+                </button>
+              </div>
 
-        <!-- Endpoints (3 Strict Categories: Messaging, USSD, Authentication) -->
-        <h6 class="text-uppercase text-white-50 fw-bold mb-2 small" style="letter-spacing: 0.5px;">Endpoints</h6>
-        <ul class="nav flex-column mb-3 ps-2">
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'messaging'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('messaging')">
-              <i class="bi bi-chat-dots me-2"></i> Messaging (SMS, Voice)
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'ussd'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('ussd')">
-              <i class="bi bi-phone me-2"></i> USSD
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'auth-endpoints'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('auth-endpoints')">
-              <i class="bi bi-shield-lock me-2"></i> Authentication (OTPs)
-            </a>
-          </li>
-        </ul>
-
-        <!-- Developer Tools -->
-        <h6 class="text-uppercase text-white-50 fw-bold mb-2 small" style="letter-spacing: 0.5px;">Developer Tools</h6>
-        <ul class="nav flex-column mb-3 ps-2">
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'playground'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('playground')">
-              <i class="bi bi-tools me-2"></i> Playground
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link offcanvas-link d-flex align-items-center py-2" :class="{'active text-white': activeSectionId === 'diagnostics'}" href="#" data-bs-dismiss="offcanvas" @click.prevent="switchSection('diagnostics')">
-              <i class="bi bi-code-square me-2"></i> Diagnostics
-            </a>
-          </li>
-        </ul>
+              <!-- Nested Submenus (Drawer Accordion) -->
+              <transition name="drawer-sub-slide">
+                <div v-if="sec.submenus && sec.submenus.length > 0 && isSectionExpanded(sec.id)" class="offcanvas-sub-list ps-3 ms-2">
+                  <ul class="nav flex-column py-1 border-start" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                    <li v-for="sub in sec.submenus" :key="sub.id" class="nav-item">
+                      <a 
+                        class="nav-link offcanvas-sub-link d-flex align-items-center justify-content-between py-1 px-2"
+                        :class="{'active': activeSectionId === sec.id && activeSubId === sub.id}"
+                        href="#"
+                        @click.prevent="navigateTo(sec.id, sub.id)"
+                      >
+                        <span class="d-flex align-items-center text-truncate me-2">
+                          <span class="sub-bullet me-2">&bull;</span>
+                          <span class="text-truncate">{{ sub.title }}</span>
+                        </span>
+                        <span v-if="sub.method" class="method-badge small-badge" :class="sub.method.toLowerCase()">
+                          {{ sub.method }}
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </transition>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="offcanvas-footer border-top p-4 mt-auto" style="border-color: rgba(255,255,255,0.08) !important; background-color: rgba(10, 40, 40, 0.98);">
