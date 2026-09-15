@@ -1,6 +1,8 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 
+const BUILD_ID = Date.now().toString()
+
 function versionPlugin() {
   return {
     name: 'version-generator',
@@ -10,7 +12,7 @@ function versionPlugin() {
         fileName: 'version.json',
         source: JSON.stringify(
           {
-            version: Date.now().toString(),
+            version: BUILD_ID,
             builtAt: new Date().toISOString()
           },
           null,
@@ -25,6 +27,6 @@ function versionPlugin() {
 export default defineConfig({
   plugins: [vue(), versionPlugin()],
   define: {
-    __APP_BUILD_TIME__: JSON.stringify(Date.now().toString())
+    __APP_BUILD_TIME__: JSON.stringify(BUILD_ID)
   }
 })

@@ -38,26 +38,22 @@ export function initVersionCheck() {
     }
   }
 
-  // 1. Initial background check
-  setTimeout(checkVersion, 3000)
-
-  // 2. Check whenever user focuses or switches back to this tab
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      checkVersion()
-    }
-  })
-
-  // 3. Periodic check every 5 minutes
-  setInterval(checkVersion, 5 * 60 * 1000)
-
-  // 4. Handle Vite chunk preload errors (e.g. if old chunks are purged from S3)
+  // 1. Event: Vite chunk preload error
+  // Fired when a new deployment has deleted old hashed chunks from S3 and the user navigates/interacts.
   window.addEventListener('vite:preloadError', (event) => {
     event.preventDefault()
     if (!isReloading) {
       isReloading = true
-      console.warn('[Pave360] Preload chunk error detected (new deployment). Reloading...')
+      console.info('[Pave360] Deployment update detected via chunk mismatch. Refreshing to latest version...')
       window.location.reload()
+    }
+  })
+
+  // 2. Event: Tab visibility change
+  // Only checks when a user explicitly returns to the tab after being away.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkVersion()
     }
   })
 }
