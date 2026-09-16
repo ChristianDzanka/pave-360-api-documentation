@@ -1,17 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { useClipboard } from '../composables/useClipboard'
 
-const copiedKey = ref(null)
-
-const copyText = (text, key) => {
-  if (!text) return
-  navigator.clipboard.writeText(text).then(() => {
-    copiedKey.value = key
-    setTimeout(() => {
-      if (copiedKey.value === key) copiedKey.value = null
-    }, 2000)
-  })
-}
+const { copiedKey, copyText } = useClipboard()
 </script>
 
 <template>

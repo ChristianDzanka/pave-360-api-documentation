@@ -1,31 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { useClipboard } from '../composables/useClipboard'
 
-const copiedKey = ref(null)
-
-const copyActiveTabCode = (wrapperId, key) => {
-  const wrapper = document.getElementById(wrapperId)
-  if (!wrapper) return
-  const activePre = wrapper.querySelector('.tab-pane.active pre') || wrapper.querySelector('pre')
-  if (!activePre) return
-  const text = activePre.innerText
-  navigator.clipboard.writeText(text).then(() => {
-    copiedKey.value = key
-    setTimeout(() => {
-      if (copiedKey.value === key) copiedKey.value = null
-    }, 2000)
-  })
-}
-
-const copyText = (text, key) => {
-  if (!text) return
-  navigator.clipboard.writeText(text).then(() => {
-    copiedKey.value = key
-    setTimeout(() => {
-      if (copiedKey.value === key) copiedKey.value = null
-    }, 2000)
-  })
-}
+const { copiedKey, copyText, copyActiveTabCode } = useClipboard()
 </script>
 
 <template>

@@ -1,5 +1,6 @@
 # Pave360 API Documentation
 
+[![Version](https://img.shields.io/badge/Version-1.1.0-059669?style=flat-square)](#recent-updates--changelog)
 [![Vue 3](https://img.shields.io/badge/Vue-3.5.41-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2.2-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.8-7952B3?style=flat-square&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
@@ -13,6 +14,7 @@ Official developer documentation and interactive API portal for **Pave360** — 
 ## 📑 Table of Contents
 
 - [Overview](#overview)
+- [Recent Updates & Changelog](#recent-updates--changelog)
 - [Key Features](#key-features)
 - [Architecture & UI Design](#architecture--ui-design)
 - [API Catalog](#api-catalog)
@@ -43,6 +45,29 @@ Built with **Vue 3** and **Vite**, the interface delivers high performance, zero
 
 ---
 
+## Recent Updates & Changelog
+
+### 🚀 Version 1.1.0 (September 2026) — Mobile Dual-Navigation & Glassmorphism Upgrade
+
+This update introduces a redesigned mobile navigation system that brings full feature parity with the desktop experience while preserving vertical screen real estate:
+
+- **Header-Attached Glassmorphic Table of Contents (TOC)**:
+  - **Translucent Frosted Glass**: Ultra-slim 38px sticky bar (`rgba(10, 40, 40, 0.72)` with `backdrop-filter: blur(20px) saturate(180%)`), allowing underlying page content to remain softly visible as you scroll.
+  - **Compact Floating Island Card**: Replaced edge-to-edge full-screen blackout sheets with a floating rounded glass dropdown (`border-radius: 12px`, side margins, `max-height: 45vh`).
+  - **Non-Intrusive Backdrop**: Subtle transparent overlay (`rgba(0, 0, 0, 0.15)`) keeping the reading surface bright, legible, and unobscured.
+  - **Real-Time Scroll-Spy Sync**: Automatically tracks current reading position and displays color-coded HTTP method badges (`POST` in green, `GET` in blue).
+  - **Calibrated Scroll Offsets**: Smooth anchor jumping calibrated for 64px phone and 80px tablet sticky navigation bars.
+
+- **Persistent Mobile Hamburger Drawer with Single-Accordion**:
+  - **Deep Hierarchy Browsing**: Categorized section structure (**Getting Started**, **Endpoints**, **Developer Tools**) with nested endpoint submenus and method tags.
+  - **Auto-Collapsing Accordion**: Tapping another section or its chevron smoothly expands that section while auto-collapsing previous submenus, keeping the drawer compact.
+  - **Persistent In-Drawer Browsing**: The sidebar remains open while tapping between sections or previewing endpoints, only closing when explicitly tapping the `[X]` close button or outside on the backdrop.
+
+- **Client-Side Cache & Deployment Auto-Reload**:
+  - Real-time build timestamp detection (`version.json`) automatically prompts or refreshes stale browser tabs upon AWS S3 / CloudFront deployment.
+
+---
+
 ## Key Features
 
 - **Three-Column Layout**: Fixed primary navigation on the left, centered dynamic API specification container, and contextual sub-navigation on the right.
@@ -54,11 +79,13 @@ Built with **Vue 3** and **Vite**, the interface delivers high performance, zero
 - **Credentials Modal**: In-browser credentials modal allowing developers to inject their organization's API key and Sender ID directly into code snippets.
 - **Interactive Playground Console**: Simulated in-browser execution environment for testing request payloads, validation rules, and error handling without incurring billing charges.
 - **Carrier Diagnostics & Error Catalog**: Comprehensive index of telecom error codes (`EXT_SYS4_*`, `API_KEY_AUTH_*`, `OTP_VAL2_*`, `EXT_VAL2_*`, `RATE_LIMIT_*`) and troubleshooting guidelines.
-- **Mobile Responsive**: Fully responsive layout with an offcanvas navigation drawer and touch-friendly controls.
+- **Enhanced Mobile Dual-Navigation**: Fully responsive mobile experience featuring a sticky translucent glassmorphic "On this page" TOC bar, floating quick-jump cards, and a persistent categorized offcanvas drawer with auto-collapsing accordions.
 
 ---
 
 ## Architecture & UI Design
+
+### Desktop Three-Column Layout (≥ 992px)
 
 ```
 +---------------------------------------------------------------------------------------+
@@ -83,6 +110,41 @@ Built with **Vue 3** and **Vite**, the interface delivers high performance, zero
 |  |   * Playground     |  |  | [Response: 200 OK JSON]   | |  |                    |  |
 |  |   * Diagnostics    |  |  +---------------------------+ |  |                    |  |
 +---------------------------------------------------------------------------------------+
+```
+
+### Mobile & Tablet Dual-Navigation Architecture (< 992px)
+
+```
++---------------------------------------------------------------------------------------+
+|  NAVBAR (Sticky Top - 64px)                                                           |
+|  [☰ Menu]                 Pave360 Developers                         [⚙ Credentials]   |
++---------------------------------------------------------------------------------------+
+|  TRANSLUCENT GLASS TOC BAR (Sticky - 38px, Frosted Glass Blur)                        |
+|  📑 On this page: Send SMS [POST]                                                 [▾] |
++---------------------------------------------------------------------------------------+
+|                                                                                       |
+|  (Tap TOC Bar -> Expands Floating Rounded Glass Card, max 45vh)                       |
+|  +---------------------------------------------------------------------------------+  |
+|  |  MESSAGING — SECTIONS                                                           |  |
+|  |  • SMS Guidelines                                                               |  |
+|  |  • Send SMS                                                              [POST] |  |
+|  |  • Bulk SMS                                                              [POST] |  |
+|  |  • SMS Status                                                             [GET] |  |
+|  +---------------------------------------------------------------------------------+  |
+|                                                                                       |
+|  FLUID CENTER CONTENT                                                                 |
+|  - Minimal Endpoint Specification Cards                                               |
+|  - Stacked Request & Response Code Sandboxes                                          |
++---------------------------------------------------------------------------------------+
+
+  [☰ Menu] Opens Persistent Categorized Offcanvas Drawer:
+  ├── GETTING STARTED
+  │   └── Overview (• API Overview, • Base Service, • Security)
+  ├── ENDPOINTS
+  │   ├── ▾ Messaging (• Guidelines, • [POST] SMS, • [POST] Bulk, • [GET] Status)
+  │   ├── ▸ USSD (Auto-collapses others when tapped)
+  │   └── ▸ Authentication
+  └── DEVELOPER TOOLS (Playground, Diagnostics)
 ```
 
 ---
@@ -312,6 +374,11 @@ The portal features a bespoke design system implemented in `src/assets/main.css`
 - `.three-column-layout`: Flexbox container constrained to `1400px` max-width with centered layout.
 - `.pave-nav-container`: Constrained navbar container matching the three-column layout boundaries.
 - `.fixed-left-sidebar` & `.fixed-right-sidebar`: Sticky navigation bars (`top: 80px`, `height: calc(100vh - 80px)`).
+- `.mobile-toc-wrapper`: Sticky container pinned directly beneath the navbar on mobile/tablet viewports (`top: 64px` / `80px`).
+- `.mobile-toc-bar`: Ultra-slim 38px translucent frosted-glass bar (`rgba(10, 40, 40, 0.72)` + blur) with real-time scroll-spy active title updates.
+- `.mobile-toc-dropdown`: Floating rounded glass card (`border-radius: 12px`, side margins, `max-height: 45vh`) for rapid in-page navigation.
+- `.offcanvas-section-row` & `.offcanvas-toggle-btn`: Accordion header controls inside the mobile drawer with synchronized chevron toggles.
+- `.offcanvas-sub-link`: Indented sub-endpoint navigation links with dark-mode method badges and active accent indicators.
 - `.endpoint-sandbox-sticky`: Sticky sandbox container pinned at `top: 96px` on screens `≥ 1200px` with constrained viewport height and custom scrolling.
 - `.moolre-param-card`: Clean card container for request headers and body/path parameters.
 - `.moolre-response-card`: Structured status-code list with colored dot indicators and response schema tables.
