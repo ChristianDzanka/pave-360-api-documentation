@@ -5,8 +5,8 @@
 </script>
 
 <template>
-  <header>
-    <nav class="navbar navbar-expand-lg sticky-top py-3 pave-main-nav" aria-label="Top Navigation">
+  <header class="sticky-top pave-main-header">
+    <nav class="navbar navbar-expand-lg py-3 pave-main-nav" aria-label="Top Navigation">
       <div class="pave-nav-container d-flex justify-content-between align-items-center">
         <!-- Hamburger (Mobile only) -->
         <button 

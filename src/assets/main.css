@@ -244,13 +244,20 @@ pre code {
 .tok-punct { color: #94a3b8; }                   /* Punctuation */
 
 /* Top Navigation Styling */
+.pave-main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  width: 100%;
+}
+
 .pave-main-nav {
   background-color: rgba(10, 40, 40, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  z-index: 1030;
   height: 80px;
+  width: 100%;
 }
 
 .pave-nav-container {
@@ -488,6 +495,9 @@ pre code {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+  }
+  .pave-main-header {
+    height: 64px !important;
   }
   .pave-main-nav {
     height: 64px !important;
